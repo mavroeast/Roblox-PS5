@@ -9,7 +9,6 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -76,11 +75,7 @@ bool Logger::init(const LogConfig& cfg) noexcept {
     if (!cfg.file_path.empty() && cfg.file_path.size() < 512) {
         char path_buf[512]{};
         std::memcpy(path_buf, cfg.file_path.data(), cfg.file_path.size());
-        // Mode 0666 so FTP users outside the title UID can pull logs on PS5.
-        file_fd_ = ::open(path_buf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-        if (file_fd_ >= 0) {
-            ::fchmod(file_fd_, 0666);
-        }
+        file_fd_ = ::open(path_buf, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     }
 
     if (!cfg.tcp_host.empty() && cfg.tcp_port != 0) {
