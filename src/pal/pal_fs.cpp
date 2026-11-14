@@ -29,8 +29,7 @@ PalResult ensure_directory(std::string_view path) noexcept {
         return PalResult::failure(EINVAL);
     }
 
-    if (::mkdir(buf, 0777) == 0) {
-        ::chmod(buf, 0777);
+    if (::mkdir(buf, 0755) == 0) {
         return PalResult::success();
     }
 
@@ -112,7 +111,7 @@ PalResult write_file_atomic_like(std::string_view path,
         return PalResult::failure(EINVAL);
     }
 
-    int fd = ::open(path_buf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    int fd = ::open(path_buf, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd < 0) {
         return PalResult::failure(errno);
     }
@@ -133,7 +132,6 @@ PalResult write_file_atomic_like(std::string_view path,
         written += static_cast<size_t>(n);
     }
 
-    ::fchmod(fd, 0666);
     ::fsync(fd);
     ::close(fd);
     return PalResult::success();
