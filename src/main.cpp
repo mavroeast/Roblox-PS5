@@ -8,24 +8,7 @@
 
 #include <array>
 #include <cstdint>
-#include <cstdlib>
 #include <span>
-#include <string_view>
-
-namespace {
-
-uint16_t parse_port_env(const char* value) noexcept {
-    if (value == nullptr || value[0] == '\0') {
-        return 0;
-    }
-    long parsed = std::strtol(value, nullptr, 10);
-    if (parsed <= 0 || parsed > 65535) {
-        return 0;
-    }
-    return static_cast<uint16_t>(parsed);
-}
-
-} // namespace
 
 int main() {
     using namespace rbxps5;
@@ -33,14 +16,11 @@ int main() {
     // 1. Initialize persistent /download0/ directory tree first so logs can be saved.
     const pal::PalResult fs_res = pal::init_storage_layout(pal::kDefaultPs5Storage);
 
-    const char* tcp_host_env = std::getenv("ROBLOX_PS5_LOG_HOST");
-    const uint16_t tcp_port_env = parse_port_env(std::getenv("ROBLOX_PS5_LOG_PORT"));
-
     pal::Logger log{};
     log.init(pal::LogConfig{
         "/download0/roblox-ps5/logs/m1_foundation.log",
-        tcp_host_env != nullptr ? std::string_view{tcp_host_env} : std::string_view{},
-        tcp_port_env,
+        {},
+        0,
     });
 
     log.write(pal::LogLevel::Info, "BOOT", "Roblox-PS5 Milestone 1 starting");
